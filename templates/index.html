@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Gallery</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles -->
+    <style>
+        body {
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0;
+        }
+
+        .header .navigation {
+            display: flex;
+            align-items: center;
+        }
+
+        .header .navigation>*:not(:last-child) {
+            margin-right: 0.5rem;
+        }
+
+        .image-container {
+            position: relative;
+            display: inline-block;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .download-btn {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            display: none;
+        }
+
+        .image-container:hover {
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .image-container:hover .download-btn {
+            display: block;
+        }
+
+        .card:hover .download-btn {
+            display: block;
+        }
+
+        .directory-container {
+            position: relative;
+            display: inline-block;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            background-color: #f8f9fa;
+            text-align: center;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .directory-container:hover {
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 이미지 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-content {
+            margin: 15% auto;
+            padding: 20px;
+            width: 80%;
+        }
+
+        /* 이미지 미리보기 스타일 */
+        .preview-container {
+            position: relative;
+        }
+
+        .image-preview {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 100%;
+            z-index: 10;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ddd;
+            padding: 5px;
+            background-color: #fff;
+        }
+
+        .image-container:hover {
+            display: block;
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 class="mb-4">Image Gallery</h1>
+    <!-- 뒤로 가기 버튼, 현재 경로, 새로고침 버튼을 한 줄에 표시 -->
+    <div class="mb-4 d-flex align-items-center">
+        <button class="btn btn-primary me-3" onclick="goToParentDirectory()">&lt;</button>
+        <span id="currentPath" class="me-3"></span>
+        <button class="btn btn-primary" onclick="location.reload()">&#x21bb;</button>
+    </div>
+
+    <div class="row">
+        <!-- 수정된 코드 -->
+        {{range .Files}}
+        {{if eq .Type "file"}}
+        <div class="col-md-4 col-sm-6 col-xs-12 mb-4">
+            <div class="image-container">
+                <div class="card">
+                    <a href="#" onclick="showModal('{{.Path}}')">
+                        <img src="/file/{{.Path}}" alt="{{.Path}}" class="img-fluid" onmouseover="showPreview(this)"
+                            onmouseout="hidePreview(this)">
+                    </a>
+                </div>
+                <div class="card-footer text-muted">
+                    {{.ModTime.Format "2006-01-02 15:04:05"}}
+                </div>
+                <a href="/file/{{.Path}}" download="{{.Path}}" class="btn btn-sm btn-dark download-btn">Download</a>
+            </div>
+        </div>
+        {{else}}
+        <div class="col-md-4 col-sm-6 col-xs-12 mb-4">
+            <div class="directory-container">
+                <a href="{{.Path}}">
+                    <div class="directory-name">
+                        {{.Path}}
+                    </div>
+                </a>
+            </div>
+        </div>
+        {{end}}
+        {{end}}
+
+    </div>
+    <!-- 이미지 모달 코드 -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <script>
+        // 이미지 모달 관련 스크립트 코드
+        function showModal(imagePath) {
+            const modal = document.getElementById("imageModal");
+            const modalImage = document.getElementById("modalImage");
+
+            modal.style.display = "block";
+            modalImage.src = "/file/" + imagePath;
+        }
+
+        function closeModal() {
+            const modal = document.getElementById("imageModal");
+            modal.style.display = "none";
+        }
+
+
+        function goToParentDirectory() {
+            const currentURL = new URL(window.location.href);
+            const currentPath = currentURL.pathname;
+            const parentPath = currentPath.substring(0, currentPath.lastIndexOf('/'));
+            window.location.href = currentURL.origin + parentPath;
+        }
+
+        function updateCurrentPath() {
+            const currentURL = new URL(window.location.href);
+            const currentPath = currentURL.pathname;
+            const currentPathElement = document.getElementById("currentPath");
+            currentPathElement.innerText = currentPath;
+        }
+
+        updateCurrentPath();
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+</body>
+
+</html>
