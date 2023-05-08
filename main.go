@@ -11,6 +11,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html"
+	"github.com/joho/godotenv"
 )
 
 type FileInfo struct {
@@ -20,6 +21,11 @@ type FileInfo struct {
 }
 
 func main() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic(err)
+	}
+
 	// HTML 템플릿 엔진 초기화
 	engine := html.New("./templates", ".html")
 	app := fiber.New(fiber.Config{
@@ -40,7 +46,7 @@ func handleRequest(c *fiber.Ctx) error {
 	}
 
 	if fullPath == "" {
-		fullPath = "data"
+		fullPath = os.Getenv("DATA_DIRECTORY")
 	}
 	fmt.Println("full path : ", fullPath)
 	file, err := os.Stat(fullPath)
