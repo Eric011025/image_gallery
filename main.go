@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"sort"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -102,6 +103,10 @@ func getFiles(dir string) ([]FileInfo, error) {
 			ModTime: file.ModTime(),
 		})
 	}
+
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].ModTime.Unix() > files[j].ModTime.Unix()
+	})
 
 	return files, nil
 }
