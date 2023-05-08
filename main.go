@@ -15,9 +15,11 @@ import (
 )
 
 type FileInfo struct {
-	Type    string
-	Path    string
-	ModTime time.Time
+	Type       string
+	Path       string
+	ModTime    time.Time
+	Resolution string
+	Exif       string
 }
 
 func main() {
