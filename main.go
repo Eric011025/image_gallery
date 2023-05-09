@@ -6,8 +6,10 @@ import (
 	"log"
 	"net/url"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -16,11 +18,12 @@ import (
 )
 
 type FileInfo struct {
-	Type       string
-	Path       string
-	ModTime    time.Time
-	Resolution string
-	Exif       string
+	Type        string
+	Path        string
+	PreviewPath string
+	ModTime     time.Time
+	Resolution  string
+	Exif        string
 }
 
 func main() {
@@ -92,15 +95,39 @@ func getFiles(dir string) ([]FileInfo, error) {
 
 	files := []FileInfo{}
 	for _, file := range localFiles {
-		fmt.Println("file list : ", file.Name())
-		fileType := "directory"
-		if !file.IsDir() {
-			fileType = "file"
+		if strings.Contains(file.Name(), ".meta") {
+			continue
 		}
+		if strings.Contains(file.Name(), ".preview") {
+			continue
+		}
+		fmt.Println("file list : ", file.Name())
+
+		filePath := filepath.Join(dir, file.Name())
+		var previewPath string
+
+		fileType := "directory"
+		if file.IsDir() == false {
+			fileType = "file"
+			previewPath = filepath.Join(dir, file.Name()+".preview")
+			_, err := os.Stat(previewPath)
+			if err != nil {
+				if os.IsNotExist(err) {
+					// create preivew file
+					err = createPreviewFile(filePath, previewPath)
+					if err != nil {
+						fmt.Println("create preview image failed : ", err.Error())
+						previewPath = filePath
+					}
+				}
+			}
+		}
+
 		files = append(files, FileInfo{
-			Type:    fileType,
-			Path:    filepath.Join(dir, file.Name()),
-			ModTime: file.ModTime(),
+			Type:        fileType,
+			Path:        filePath,
+			PreviewPath: previewPath,
+			ModTime:     file.ModTime(),
 		})
 	}
 
@@ -109,4 +136,13 @@ func getFiles(dir string) ([]FileInfo, error) {
 	})
 
 	return files, nil
+}
+
+func createPreviewFile(sourcePath string, previewPath string) error {
+	fmt.Println("preview image create : ", sourcePath, previewPath)
+	err := exec.Command("ffmpeg", "-i", sourcePath, "-vf", "scale=iw/2:ih/2", "-f", "image2", "-y", previewPath).Run()
+	if err != nil {
+		return err
+	}
+	return nil
 }
