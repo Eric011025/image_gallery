@@ -167,20 +167,20 @@
             <div class="image-container">
                 <div class="card">
                     <a href="#" onclick="showModal(event, '{{.Path}}')">
-                        <img src="/file/{{.PreviewPath}}" alt="{{.PreviewPath}}" class="img-fluid"
+                        <img src="/{{.PreviewPath}}" alt="{{.PreviewPath}}" class="img-fluid"
                             onmouseover="showPreview(this)" onmouseout="hidePreview(this)">
                     </a>
                 </div>
                 <div class="card-footer text-muted">
                     {{.ModTime.Format "2006-01-02 15:04:05"}}
                 </div>
-                <a href="/file/{{.Path}}" download="{{.Path}}" class="btn btn-sm btn-dark download-btn">Download</a>
+                <a href="/{{.Path}}" download="/{{.Path}}" class="btn btn-sm btn-dark download-btn">Download</a>
             </div>
         </div>
         {{else}}
         <div class="col-md-4 col-sm-6 col-xs-12 mb-4">
             <div class="directory-container">
-                <a href="{{.Path}}">
+                <a href="/{{.Path}}">
                     <div class="directory-name">
                         {{.Path}}
                     </div>
@@ -207,7 +207,7 @@
             const modalImage = document.getElementById("modalImage");
 
             modal.style.display = "block";
-            modalImage.src = "/file/" + imagePath;
+            modalImage.src = imagePath;
         }
 
         function closeModal() {

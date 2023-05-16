@@ -39,7 +39,6 @@ func main() {
 	})
 
 	// 요청 URL의 경로에 따라 파일 데이터 또는 파일 목록을 반환하는 엔드포인트
-	app.Get("/file/*", handleFileRequest)
 	app.Get("/*", handleRequest)
 
 	log.Fatal(app.Listen(os.Getenv("SERVER_PORT")))
@@ -72,18 +71,6 @@ func handleRequest(c *fiber.Ctx) error {
 	} else {
 		return c.SendFile(fullPath)
 	}
-}
-
-func handleFileRequest(c *fiber.Ctx) error {
-	fmt.Println("file request")
-	path, err := url.PathUnescape(c.Params("*", ""))
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid file path")
-	}
-
-	fullPath := path
-	fmt.Println("full path : ", fullPath)
-	return c.SendFile(fullPath)
 }
 
 // getFiles는 디렉토리에서 이미지 파일 목록을 반환합니다.
