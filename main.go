@@ -140,7 +140,7 @@ func getFiles(dir string) ([]FileInfo, error) {
 
 func createPreviewFile(sourcePath string, previewPath string) error {
 	fmt.Println("preview image create : ", sourcePath, previewPath)
-	err := exec.Command("ffmpeg", "-i", sourcePath, "-vf", "scale=iw/2:ih/2", "-f", "image2", "-y", previewPath).Run()
+	err := exec.Command("ffmpeg", "-i", sourcePath, "-vf", "scale=-2:360", "-f", "image2", "-y", previewPath).Run()
 	if err != nil {
 		return err
 	}
