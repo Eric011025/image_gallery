@@ -166,7 +166,7 @@
         <div class="col-md-4 col-sm-6 col-xs-12 mb-4">
             <div class="image-container">
                 <div class="card">
-                    <a href="#" onclick="showModal('{{.Path}}')">
+                    <a href="#" onclick="showModal(event, '{{.Path}}')">
                         <img src="/file/{{.PreviewPath}}" alt="{{.PreviewPath}}" class="img-fluid"
                             onmouseover="showPreview(this)" onmouseout="hidePreview(this)">
                     </a>
@@ -200,7 +200,9 @@
 
     <script>
         // 이미지 모달 관련 스크립트 코드
-        function showModal(imagePath) {
+        function showModal(event, imagePath) {
+            event.preventDefault(); // Prevent the default action of the <a> tag.
+
             const modal = document.getElementById("imageModal");
             const modalImage = document.getElementById("modalImage");
 
