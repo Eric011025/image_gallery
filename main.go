@@ -42,7 +42,7 @@ func main() {
 	app.Get("/file/*", handleFileRequest)
 	app.Get("/*", handleRequest)
 
-	log.Fatal(app.Listen(":3000"))
+	log.Fatal(app.Listen(os.Getenv("SERVER_PORT")))
 }
 
 func handleRequest(c *fiber.Ctx) error {
