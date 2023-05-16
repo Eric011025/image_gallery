@@ -121,6 +121,33 @@
         .container {
             margin-top: 20px;
         }
+
+        #scroll-to-bottom {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 999;
+            opacity: 0.5;
+            cursor: pointer;
+        }
+
+        #scroll-to-bottom:hover {
+            opacity: 1;
+        }
+
+        #scroll-to-top {
+            position: fixed;
+            bottom: 60px;
+            /* Adjust as needed */
+            left: 20px;
+            z-index: 999;
+            opacity: 0.5;
+            cursor: pointer;
+        }
+
+        #scroll-to-top:hover {
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -138,14 +165,12 @@
         {{if eq .Type "file"}}
         <div class="col-md-4 col-sm-6 col-xs-12 mb-4">
             <div class="image-container">
-                <a href="#" onclick="showModal('{{.Path}}')">
-                    <div class="card">
-                        <a href="#" onclick="showModal('{{.Path}}')">
-                            <img src="/file/{{.Path}}" alt="{{.Path}}" class="img-fluid" onmouseover="showPreview(this)"
-                                onmouseout="hidePreview(this)">
-                        </a>
-                    </div>
-                </a>
+                <div class="card">
+                    <a href="#" onclick="showModal('{{.Path}}')">
+                        <img src="/file/{{.PreviewPath}}" alt="{{.PreviewPath}}" class="img-fluid"
+                            onmouseover="showPreview(this)" onmouseout="hidePreview(this)">
+                    </a>
+                </div>
                 <div class="card-footer text-muted">
                     {{.ModTime.Format "2006-01-02 15:04:05"}}
                 </div>
@@ -170,6 +195,9 @@
         <img class="modal-content" id="modalImage">
     </div>
 
+    <button id="scroll-to-top" onclick="scrollToTop()">&#x21e7;</button>
+    <button id="scroll-to-bottom" onclick="scrollToBottom()">&#x21e9;</button>
+
     <script>
         // 이미지 모달 관련 스크립트 코드
         function showModal(imagePath) {
@@ -191,6 +219,20 @@
             const currentPath = currentURL.pathname;
             const parentPath = currentPath.substring(0, currentPath.lastIndexOf('/'));
             window.location.href = currentURL.origin + parentPath;
+        }
+
+        function scrollToBottom() {
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         }
 
         function updateCurrentPath() {
