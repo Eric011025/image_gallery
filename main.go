@@ -23,12 +23,12 @@ var (
 )
 
 type FileInfo struct {
-	Type        string
-	Path        string
-	PreviewPath string
-	ModTime     time.Time
-	Resolution  string
-	Exif        string
+	Type        string    `json:"type"`
+	Path        string    `json:"path"`
+	PreviewPath string    `json:"preview_path"`
+	ModTime     time.Time `json:"mod_time"`
+	Resolution  string    `json:"resolution"`
+	Exif        string    `json:"exif"`
 }
 
 func init() {
@@ -56,11 +56,13 @@ func main() {
 
 func handleRequest(c *fiber.Ctx) error {
 	var (
+		format   string
 		fullPath string
 		file     fs.FileInfo
 		files    []FileInfo
 		err      error
 	)
+	format = c.Query("format", "render")
 
 	if fullPath, err = url.PathUnescape(c.Params("*", "")); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid file path")
@@ -78,6 +80,10 @@ func handleRequest(c *fiber.Ctx) error {
 	if file.IsDir() {
 		if files, err = getFiles(fullPath); err != nil {
 			return c.Status(500).SendString("Internal Server Error")
+		}
+
+		if format == "json" {
+			return c.JSON(files)
 		}
 
 		return c.Render("index", fiber.Map{

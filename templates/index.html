@@ -301,6 +301,26 @@
             currentPathElement.innerText = currentPath;
         }
 
+        function refreshImageList() {
+            // AJAX 요청을 사용하여 이미지 목록을 가져옵니다.
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    // 서버에서 응답을 받으면 이미지 목록을 업데이트합니다.
+                    document.querySelector('.row').innerHTML = this.responseText;
+                }
+            };
+            var currentUrl = window.location.href;
+            xhttp.open("GET", currentUrl + "?format=json", true);
+            xhttp.send();
+        }
+
+        // 새로고침 버튼의 클릭 이벤트를 수정하여 이미지 목록만 새로고침하게 만듭니다.
+        document.querySelector(".btn.btn-primary").onclick = function (event) {
+            event.preventDefault();
+            refreshImageList();
+        };
+
         updateCurrentPath();
     </script>
 
