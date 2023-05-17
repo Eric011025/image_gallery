@@ -214,12 +214,9 @@
                 <div class="card-footer text-muted">
                     {{.ModTime.Format "2006-01-02 15:04:05"}}
                 </div>
-                <a href="/{{.Path}}" download="/{{.Path}}"
-                    class="btn btn-sm btn-dark download-btn">Download</a>
-                <button class="btn btn-sm btn-info bookmark-btn"
-                    onclick="bookmarkFile('/{{.Path}}')">Bookmark</button>
-                <button class="btn btn-sm btn-danger btn-delete"
-                    onclick="deleteFile('/{{.Path}}')">Delete</button>
+                <a href="/{{.Path}}" download="/{{.Path}}" class="btn btn-sm btn-dark download-btn">Download</a>
+                <button class="btn btn-sm btn-info bookmark-btn" onclick="bookmarkFile('/{{.Path}}')">Bookmark</button>
+                <button class="btn btn-sm btn-danger btn-delete" onclick="deleteFile('/{{.Path}}')">Delete</button>
                 <button class="btn btn-sm btn-primary btn-menu" onclick="toggleMenu(this)">⋮</button>
             </div>
         </div>
