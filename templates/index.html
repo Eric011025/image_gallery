@@ -195,9 +195,9 @@
     <h1 class="mb-4">Image Gallery</h1>
     <!-- 뒤로 가기 버튼, 현재 경로, 새로고침 버튼을 한 줄에 표시 -->
     <div class="mb-4 d-flex align-items-center">
-        <button class="btn btn-primary me-3" onclick="goToParentDirectory()">&lt;</button>
+        <button class="btn btn-primary me-3 back-button" onclick="goToParentDirectory()">&lt;</button>
         <span id="currentPath" class="me-3"></span>
-        <button class="btn btn-primary" onclick="location.reload()">&#x21bb;</button>
+        <button class="btn btn-primary refresh-button" onclick="location.reload()">&#x21bb;</button>
     </div>
 
     <div class="row">
@@ -207,8 +207,7 @@
             <div class="image-container">
                 <div class="card">
                     <a href="#" onclick="showModal(event, '/{{.Path}}')">
-                        <img src="/{{.PreviewPath}}" alt="/{{.PreviewPath}}" class="img-fluid"
-                            onmouseover="showPreview(this)" onmouseout="hidePreview(this)">
+                        <img src="/{{.PreviewPath}}" alt="/{{.PreviewPath}}" class="img-fluid">
                     </a>
                 </div>
                 <div class="card-footer text-muted">
@@ -275,10 +274,22 @@
 
         function goToParentDirectory() {
             const currentURL = new URL(window.location.href);
+            console.log(currentURL);
             const currentPath = currentURL.pathname;
+            console.log(currentPath);
             const parentPath = currentPath.substring(0, currentPath.lastIndexOf('/'));
-            window.location.href = currentURL.origin + parentPath;
+            console.log(parentPath);
+
+            // Remove 'format' query parameter
+            currentURL.searchParams.delete('format');
+
+            // Update the pathname with the parentPath
+            currentURL.pathname = parentPath;
+
+            // Navigate to the modified URL
+            window.location.href = currentURL.toString();
         }
+
 
         function scrollToBottom() {
             window.scrollTo({
@@ -316,7 +327,7 @@
         }
 
         // 새로고침 버튼의 클릭 이벤트를 수정하여 이미지 목록만 새로고침하게 만듭니다.
-        document.querySelector(".btn.btn-primary").onclick = function (event) {
+        document.querySelector(".refresh-button").onclick = function (event) {
             event.preventDefault();
             refreshImageList();
         };
