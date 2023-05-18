@@ -15,6 +15,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html"
 	"github.com/joho/godotenv"
+
+	"github.com/Eric011025/image_gallery/filemeta"
 )
 
 var (
@@ -23,12 +25,11 @@ var (
 )
 
 type FileInfo struct {
-	Type        string    `json:"type"`
-	Path        string    `json:"path"`
-	PreviewPath string    `json:"preview_path"`
-	ModTime     time.Time `json:"mod_time"`
-	Resolution  string    `json:"resolution"`
-	Exif        string    `json:"exif"`
+	Type        string            `json:"type"`
+	Path        string            `json:"path"`
+	PreviewPath string            `json:"preview_path"`
+	ModTime     time.Time         `json:"mod_time"`
+	FileMeta    filemeta.FileMeta `json:"file_meta"`
 }
 
 func init() {
@@ -49,12 +50,51 @@ func main() {
 	})
 
 	// 요청 URL의 경로에 따라 파일 데이터 또는 파일 목록을 반환하는 엔드포인트
-	app.Get("/*", handleRequest)
+	app.Get("/*", GetFileHandler)
+	app.Delete("/*", DeleteFileHandler)
 
 	log.Fatal(app.Listen(serverPort))
 }
 
-func handleRequest(c *fiber.Ctx) error {
+func DeleteFileHandler(c *fiber.Ctx) error {
+	var (
+		fullPath string
+		metaPath string
+		fileStat fs.FileInfo
+		meta     filemeta.FileMeta
+		err      error
+	)
+	fmt.Println("delete request")
+
+	if fullPath, err = url.PathUnescape(c.Params("*", "")); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid file path")
+	}
+
+	if fileStat, err = os.Stat(fullPath); err != nil {
+		if os.IsNotExist(err) {
+			return c.Status(fiber.StatusNotFound).SendString("File not found")
+		}
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid file path")
+	}
+
+	if fileStat.IsDir() {
+		// TODO : 나중에 디렉토리 삭제 기능 추가 필요
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid file path")
+	}
+
+	// file meta file
+	metaPath = fullPath + ".meta"
+	if meta, err = filemeta.ReadMeta(metaPath); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid file path")
+	}
+	fmt.Println(metaPath)
+	meta.FileHide()
+	meta.WriteMetaFile(metaPath)
+
+	return c.Status(fiber.StatusOK).SendString("Delete file success")
+}
+
+func GetFileHandler(c *fiber.Ctx) error {
 	var (
 		format   string
 		fullPath string
@@ -99,6 +139,7 @@ func getFiles(dir string) ([]FileInfo, error) {
 	var (
 		fileList []fs.DirEntry
 		files    []FileInfo
+		meta     filemeta.FileMeta
 		err      error
 	)
 
@@ -127,6 +168,14 @@ func getFiles(dir string) ([]FileInfo, error) {
 
 		fileType := "directory"
 		if !file.IsDir() {
+			// 삭제한 파일인지 확인
+			if meta, err = filemeta.ReadMeta(filePath + ".meta"); err != nil {
+				return nil, err
+			}
+			if meta.Hide {
+				continue
+			}
+
 			fileType = "file"
 			previewPath = filepath.Join(dir, file.Name()+".preview")
 			if _, err := os.Stat(previewPath); err != nil {

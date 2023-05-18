@@ -64,8 +64,6 @@
             box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
         }
 
-        .btn-menu,
-        .btn-delete,
         .download-btn,
         .bookmark-btn {
             position: absolute;
@@ -73,17 +71,6 @@
             transform: translateX(100%);
             transition: all 0.3s ease;
             background-color: #f8f9fa;
-        }
-
-        .btn-menu {
-            display: block;
-            bottom: 5px;
-            right: 5px;
-            width: 30px;
-            position: absolute;
-            transform: translateX(0);
-            opacity: 1;
-            transition: all 0.3s ease;
         }
 
         #scroll-to-bottom {
@@ -111,6 +98,7 @@
         .button-group {
             padding: 0 7px 5px;
         }
+
 
         .modal {
             display: none;
@@ -182,10 +170,8 @@
                         title="Download"><i class="fas fa-download"></i></a>
                     <button class="btn btn-light btn-sm btn-bookmark" title="Bookmark" onClick="bookmarkImage()"><i
                             class="fas fa-bookmark"></i></button>
-                    <button class="btn btn-light btn-sm btn-delete" title="Delete" onClick="deleteImage()"><i
-                            class="fas fa-trash"></i></button>
-                    <button class="btn btn-light btn-sm btn-menu" title="Menu" onClick="toggleMenu()"><i
-                            class="fas fa-ellipsis-v"></i></button>
+                    <button class="btn btn-light btn-sm btn-delete" title="Delete"
+                        onClick="deleteImage('/{{.Path}}')"><i class="fas fa-trash"></i></button>
                 </div>
             </div>
         </div>
@@ -213,12 +199,24 @@
 
     <script>
         function toggleMenu(menuButton) {
+            event.stopPropagation();
             menuButton.parentElement.classList.toggle('menu-open');
         }
 
         function deleteImage(filePath) {
-            // 이곳에 삭제 기능을 구현하세요.
-            console.log('Delete file:', filePath);
+            fetch(filePath, {
+                    method: 'DELETE',
+                })
+                .then(response => {
+                    if (response.status === 200) {
+                        console.log(`File at ${filePath} was deleted successfully.`);
+                        location.reload();
+                    } else {
+                        console.error(`Failed to delete file at ${filePath}. Server responded with status:`,
+                            response.status);
+                    }
+                })
+                .catch(error => console.error(`Failed to delete file at ${filePath}.`, error));
         }
 
         function bookmarkImage(filePath) {
