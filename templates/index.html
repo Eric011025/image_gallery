@@ -274,20 +274,9 @@
 
         function goToParentDirectory() {
             const currentURL = new URL(window.location.href);
-            console.log(currentURL);
             const currentPath = currentURL.pathname;
-            console.log(currentPath);
             const parentPath = currentPath.substring(0, currentPath.lastIndexOf('/'));
-            console.log(parentPath);
-
-            // Remove 'format' query parameter
-            currentURL.searchParams.delete('format');
-
-            // Update the pathname with the parentPath
-            currentURL.pathname = parentPath;
-
-            // Navigate to the modified URL
-            window.location.href = currentURL.toString();
+            window.location.href = currentURL.origin + parentPath;
         }
 
 
