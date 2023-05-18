@@ -108,7 +108,7 @@ func GetFileHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid file path")
 	}
 
-	if fullPath == "" {
+	if strings.Split(fullPath, "/")[0] != dataDir && strings.Split(fullPath, "/")[0] != "favicon.ico" {
 		fullPath = dataDir
 	}
 	fmt.Println("full path : ", fullPath)
