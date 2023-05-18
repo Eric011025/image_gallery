@@ -79,7 +79,7 @@
 
         .btn-menu {
             display: block;
-            bottom: 0px;
+            bottom: 5px;
             right: 5px;
             width: 30px;
             position: absolute;
@@ -113,6 +113,14 @@
             opacity: 0.5;
             cursor: pointer;
         }
+
+        .card-footer {
+            padding: 0 10px 0;
+        }
+
+        .button-group {
+            padding: 0 7px 5px;
+        }
     </style>
 
 </head>
@@ -139,15 +147,12 @@
                 <div class="card-footer text-muted">
                     {{.ModTime.Format "2006-01-02 15:04:05"}}
                 </div>
-                <a href="/{{.Path}}" download="/{{.Path}}" class="btn btn-light btn-sm btn-download" title="Download"><i
-                        class="fas fa-download"></i></a>
-                <button class="btn btn-light btn-sm btn-bookmark" title="Bookmark" onClick="bookmarkImage()"><i
-                        class="fas fa-bookmark"></i></button>
-                <button class="btn btn-light btn-sm btn-delete" title="Delete" onClick="deleteImage()"><i
-                        class="fas fa-trash"></i></button>
-                <button class="btn btn-light btn-sm btn-menu" title="Menu" onClick="toggleMenu()"><i
-                        class="fas fa-ellipsis-v"></i></button>
-
+                <div class="button-group">
+                    <a href="/{{.Path}}" download="/{{.Path}}" class="btn btn-light btn-sm btn-download" title="Download"><i class="fas fa-download"></i></a>
+                    <button class="btn btn-light btn-sm btn-bookmark" title="Bookmark" onClick="bookmarkImage()"><i class="fas fa-bookmark"></i></button>
+                    <button class="btn btn-light btn-sm btn-delete" title="Delete" onClick="deleteImage()"><i class="fas fa-trash"></i></button>
+                    <button class="btn btn-light btn-sm btn-menu" title="Menu" onClick="toggleMenu()"><i class="fas fa-ellipsis-v"></i></button>
+                </div>
             </div>
         </div>
         {{else}}
