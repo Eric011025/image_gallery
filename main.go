@@ -120,9 +120,6 @@ func GetFileHandler(c *fiber.Ctx) error {
 		fullPath = dataDir
 	}
 
-	
-	
-
 	if isUnpublicFile(fullPath) {
 		return c.Status(fiber.StatusNotFound).SendFile("File Not Found")
 	}
@@ -215,6 +212,9 @@ func getFiles(dir string) ([]FileInfo, error) {
 				}
 			}
 		}
+
+		filePath = strings.Replace(filePath, "\\", "/", -1)
+		previewPath = strings.Replace(previewPath, "\\", "/", -1)
 
 		files = append(files, FileInfo{
 			Type:        fileType,
