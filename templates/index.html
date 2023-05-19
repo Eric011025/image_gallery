@@ -32,8 +32,15 @@
             border-bottom: 1px solid #ebebeb;
         }
 
+        .header .title-and-path {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+        }
+
         .header h1 {
-            font-size: 1.5rem;
             margin-bottom: 0;
         }
 
@@ -44,6 +51,24 @@
 
         .header .navigation>*:not(:last-child) {
             margin-right: 0.5rem;
+        }
+
+        .navigation-icon {
+            transition: transform 0.05s ease-in-out;
+        }
+
+        .navigation-icon:hover {
+            transform: scale(1.4);
+        }
+
+        .navigation-icon:active {
+            transform: scale(0.7);
+        }
+
+        .navigation,
+        .refresh-container {
+            display: flex;
+            align-items: center;
         }
 
         .image-container,
@@ -144,12 +169,17 @@
 </head>
 
 <body>
-    <h1 class="mb-4">Image Gallery</h1>
-    <!-- 뒤로 가기 버튼, 현재 경로, 새로고침 버튼을 한 줄에 표시 -->
-    <div class="mb-4 d-flex align-items-center">
-        <button class="btn btn-primary me-3 back-button" onclick="goToParentDirectory()">&lt;</button>
-        <span id="currentPath" class="me-3"></span>
-        <button class="btn btn-primary refresh-button" onclick="location.reload()">&#x21bb;</button>
+    <div class="header">
+        <div class="navigation">
+            <i class="fas fa-arrow-left navigation-icon back-button" onclick="goToParentDirectory()"></i>
+        </div>
+        <div class="title-and-path">
+            <h1>Image Gallery</h1>
+            <span id="currentPath"></span>
+        </div>
+        <div class="refresh-container">
+            <i class="fas fa-sync-alt navigation-icon refresh-button" onclick="refreshImageList()"></i>
+        </div>
     </div>
 
     <div class="row">
@@ -240,15 +270,6 @@
             modal.style.display = "none";
         }
 
-
-        function goToParentDirectory() {
-            const currentURL = new URL(window.location.href);
-            const currentPath = currentURL.pathname;
-            const parentPath = currentPath.substring(0, currentPath.lastIndexOf('/'));
-            window.location.href = currentURL.origin + parentPath;
-        }
-
-
         function scrollToBottom() {
             window.scrollTo({
                 top: document.body.scrollHeight,
@@ -270,6 +291,14 @@
             currentPathElement.innerText = currentPath;
         }
 
+        function goToParentDirectory() {
+            const currentURL = new URL(window.location.href);
+            const currentPath = currentURL.pathname;
+            const parentPath = currentPath.substring(0, currentPath.lastIndexOf('/'));
+            window.location.href = currentURL.origin + parentPath;
+            updateCurrentPath(); // 페이지 이동 후에도 currentPath를 갱신합니다.
+        }
+
         function refreshImageList() {
             // AJAX 요청을 사용하여 이미지 목록을 가져옵니다.
             var xhttp = new XMLHttpRequest();
@@ -284,10 +313,10 @@
             xhttp.send();
         }
 
-        // 새로고침 버튼의 클릭 이벤트를 수정하여 이미지 목록만 새로고침하게 만듭니다.
         document.querySelector(".refresh-button").onclick = function (event) {
             event.preventDefault();
             refreshImageList();
+            updateCurrentPath(); // 새로고침 이후에도 currentPath를 갱신합니다.
         };
 
         updateCurrentPath();
