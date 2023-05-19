@@ -112,10 +112,16 @@ func GetFileHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid File Path")
 	}
 
+	fullPath = strings.Replace(fullPath, "\\", "/", -1)
+	fmt.Println("full path : ", fullPath)
+
+
 	if strings.Split(fullPath, "/")[0] != dataDir && strings.Split(fullPath, "/")[0] != "favicon.ico" {
 		fullPath = dataDir
 	}
-	fmt.Println("full path : ", fullPath)
+
+	
+	
 
 	if isUnpublicFile(fullPath) {
 		return c.Status(fiber.StatusNotFound).SendFile("File Not Found")
