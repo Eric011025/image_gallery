@@ -64,34 +64,38 @@ func DeleteFileHandler(c *fiber.Ctx) error {
 		meta     filemeta.FileMeta
 		err      error
 	)
-	fmt.Println("delete request")
 
 	if fullPath, err = url.PathUnescape(c.Params("*", "")); err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid file path")
+		return c.Status(fiber.StatusInternalServerError).SendString("Internal Server Error")
+	}
+
+	if isUnmodifiableFile(fullPath) {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid File Path")
 	}
 
 	if fileStat, err = os.Stat(fullPath); err != nil {
 		if os.IsNotExist(err) {
-			return c.Status(fiber.StatusNotFound).SendString("File not found")
+			return c.Status(fiber.StatusNotFound).SendString("File Not Found")
 		}
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid file path")
+		return c.Status(fiber.StatusInternalServerError).SendString("Internal Server Error")
 	}
 
 	if fileStat.IsDir() {
 		// TODO : 나중에 디렉토리 삭제 기능 추가 필요
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid file path")
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid File Path")
 	}
 
 	// file meta file
 	metaPath = fullPath + ".meta"
 	if meta, err = filemeta.ReadMeta(metaPath); err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid file path")
+		return c.Status(fiber.StatusInternalServerError).SendString("Internal Server Error")
 	}
-	fmt.Println(metaPath)
 	meta.FileHide()
-	meta.WriteMetaFile(metaPath)
+	if _, err = meta.WriteMetaFile(metaPath); err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Internal Server Error")
+	}
 
-	return c.Status(fiber.StatusOK).SendString("Delete file success")
+	return c.Status(fiber.StatusOK).SendString("Delete File Success")
 }
 
 func GetFileHandler(c *fiber.Ctx) error {
@@ -105,7 +109,7 @@ func GetFileHandler(c *fiber.Ctx) error {
 	format = c.Query("format", "render")
 
 	if fullPath, err = url.PathUnescape(c.Params("*", "")); err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid file path")
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid File Path")
 	}
 
 	if strings.Split(fullPath, "/")[0] != dataDir && strings.Split(fullPath, "/")[0] != "favicon.ico" {
@@ -113,7 +117,14 @@ func GetFileHandler(c *fiber.Ctx) error {
 	}
 	fmt.Println("full path : ", fullPath)
 
+	if isUnpublicFile(fullPath) {
+		return c.Status(fiber.StatusNotFound).SendFile("File Not Found")
+	}
+
 	if file, err = os.Stat(fullPath); err != nil {
+		if os.IsNotExist(err) {
+			return c.Status(fiber.StatusNotFound).SendString("File Not Found")
+		}
 		return c.Status(500).SendString("Internal Server Error")
 	}
 
@@ -132,6 +143,19 @@ func GetFileHandler(c *fiber.Ctx) error {
 	} else {
 		return c.SendFile(fullPath)
 	}
+}
+
+func isUnpublicFile(path string) bool {
+	return strings.Contains(path, ".meta")
+}
+
+func isUnmodifiableFile(path string) bool {
+	if strings.Contains(path, ".meta") {
+		return true
+	} else if strings.Contains(path, ".preview") {
+		return true
+	}
+	return false
 }
 
 // getFiles는 디렉토리에서 이미지 파일 목록을 반환합니다.
@@ -153,10 +177,7 @@ func getFiles(dir string) ([]FileInfo, error) {
 			fileStat    fs.FileInfo
 		)
 
-		if strings.Contains(file.Name(), ".meta") {
-			continue
-		}
-		if strings.Contains(file.Name(), ".preview") {
+		if isUnmodifiableFile(file.Name()) {
 			continue
 		}
 
