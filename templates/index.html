@@ -166,6 +166,11 @@
                 transform: scale(1)
             }
         }
+
+        /* 북마크 스타일 */
+        .bookmark-icon {
+            color: red;
+        }
     </style>
 </head>
 
@@ -199,8 +204,8 @@
                 <div class="button-group">
                     <a href="/{{.Path}}" download="/{{.Path}}" class="btn btn-light btn-sm btn-download"
                         title="Download"><i class="fas fa-download"></i></a>
-                    <button class="btn btn-light btn-sm btn-bookmark" title="Bookmark" onClick="bookmarkImage()"><i
-                            class="fas fa-bookmark"></i></button>
+                    <button class="btn btn-light btn-sm btn-bookmark" title="Bookmark"
+                    onClick="bookmarkImage('{{.Path}}', this)"><i class="fas fa-bookmark {{if .FileMeta.Bookmark}}bookmark-icon{{end}}"></i></button>
                     <button class="btn btn-light btn-sm btn-delete" title="Delete"
                         onClick="deleteImage('/{{.Path}}')"><i class="fas fa-trash"></i></button>
                 </div>
@@ -250,9 +255,21 @@
                 .catch(error => console.error(`Failed to delete file at ${filePath}.`, error));
         }
 
-        function bookmarkImage(filePath) {
-            // 이곳에 북마크 기능을 구현하세요.
-            console.log('Bookmark file:', filePath);
+        function bookmarkImage(filePath, button) {
+            // 북마크 버튼 클릭 시 호출되는 함수입니다.
+            fetch(`/${filePath}`, {
+                    method: 'PATCH',
+                })
+                .then(response => {
+                    if (response.status === 200) {
+                        console.log(`File at ${filePath} was bookmarked successfully.`);
+                        button.firstElementChild.classList.toggle('bookmark-icon');
+                    } else {
+                        console.error(`Failed to bookmark file at ${filePath}. Server responded with status:`,
+                            response.status);
+                    }
+                })
+                .catch(error => console.error(`Failed to bookmark file at ${filePath}.`, error));
         }
 
         // 이미지 모달 관련 스크립트 코드
