@@ -7,10 +7,12 @@ import (
 )
 
 type FileMeta struct {
-	Hide       bool   `json:"hide"`
-	HideTime   string `json:"hide_time"`
-	Resolution string `json:"resolution"`
-	Exif       string `json:"exif"`
+	Hide         bool   `json:"hide"`
+	HideTime     string `json:"hide_time"`
+	Bookmark     bool   `json:"bookmark"`
+	BookmarkTime string `json:"bookmark_time"`
+	Resolution   string `json:"resolution"`
+	Exif         string `json:"exif"`
 }
 
 func ReadMeta(path string) (FileMeta, error) {
@@ -55,4 +57,9 @@ func (meta *FileMeta) WriteMetaFile(path string) (FileMeta, error) {
 func (meta *FileMeta) FileHide() {
 	meta.Hide = true
 	meta.HideTime = time.Now().String()
+}
+
+func (meta *FileMeta) FileBookmark() {
+	meta.Bookmark = !meta.Bookmark
+	meta.BookmarkTime = time.Now().String()
 }

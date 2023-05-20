@@ -52,6 +52,7 @@ func main() {
 	// 요청 URL의 경로에 따라 파일 데이터 또는 파일 목록을 반환하는 엔드포인트
 	app.Get("/*", GetFileHandler)
 	app.Delete("/*", DeleteFileHandler)
+	app.Patch("/*", PatchBookmarkHandler)
 
 	log.Fatal(app.Listen(serverPort))
 }
@@ -98,6 +99,47 @@ func DeleteFileHandler(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).SendString("Delete File Success")
 }
 
+func PatchBookmarkHandler(c *fiber.Ctx) error {
+	var (
+		fullPath string
+		metaPath string
+		fileStat fs.FileInfo
+		meta     filemeta.FileMeta
+		err      error
+	)
+
+	if fullPath, err = url.PathUnescape(c.Params("*", "")); err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Internal Server Error")
+	}
+
+	if isUnmodifiableFile(fullPath) {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid File Path")
+	}
+
+	if fileStat, err = os.Stat(fullPath); err != nil {
+		if os.IsNotExist(err) {
+			return c.Status(fiber.StatusNotFound).SendString("File Not Found")
+		}
+		return c.Status(fiber.StatusInternalServerError).SendString("Internal Server Error")
+	}
+
+	if fileStat.IsDir() {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid File Path")
+	}
+
+	// file meta file
+	metaPath = fullPath + ".meta"
+	if meta, err = filemeta.ReadMeta(metaPath); err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Internal Server Error")
+	}
+	meta.FileBookmark()
+	if _, err = meta.WriteMetaFile(metaPath); err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Internal Server Error")
+	}
+
+	return c.Status(fiber.StatusOK).SendString("Bookmark Success")
+}
+
 func GetFileHandler(c *fiber.Ctx) error {
 	var (
 		format   string
@@ -114,7 +156,6 @@ func GetFileHandler(c *fiber.Ctx) error {
 
 	fullPath = strings.Replace(fullPath, "\\", "/", -1)
 	fmt.Println("full path : ", fullPath)
-
 
 	if strings.Split(fullPath, "/")[0] != dataDir && strings.Split(fullPath, "/")[0] != "favicon.ico" {
 		fullPath = dataDir
@@ -221,6 +262,7 @@ func getFiles(dir string) ([]FileInfo, error) {
 			Path:        filePath,
 			PreviewPath: previewPath,
 			ModTime:     fileStat.ModTime(),
+			FileMeta:    meta,
 		})
 	}
 
