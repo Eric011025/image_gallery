@@ -264,6 +264,7 @@
                     if (response.status === 200) {
                         console.log(`File at ${filePath} was bookmarked successfully.`);
                         button.firstElementChild.classList.toggle('bookmark-icon');
+                        location.reload();
                     } else {
                         console.error(`Failed to bookmark file at ${filePath}. Server responded with status:`,
                             response.status);
