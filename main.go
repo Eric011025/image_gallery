@@ -92,7 +92,7 @@ func DeleteFileHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString("Internal Server Error")
 	}
 	meta.FileHide()
-	if _, err = meta.WriteMetaFile(metaPath); err != nil {
+	if err = meta.WriteMetaFile(metaPath); err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString("Internal Server Error")
 	}
 
@@ -133,7 +133,7 @@ func PatchBookmarkHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString("Internal Server Error")
 	}
 	meta.FileBookmark()
-	if _, err = meta.WriteMetaFile(metaPath); err != nil {
+	if err = meta.WriteMetaFile(metaPath); err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString("Internal Server Error")
 	}
 

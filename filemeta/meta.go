@@ -25,7 +25,7 @@ func ReadMeta(path string) (FileMeta, error) {
 	if fileByte, err = os.ReadFile(path); err != nil {
 		if os.IsNotExist(err) {
 			// create meta file
-			if meta, err = meta.WriteMetaFile(path); err != nil {
+			if err = meta.WriteMetaFile(path); err != nil {
 				return meta, err
 			}
 		}
@@ -39,19 +39,19 @@ func ReadMeta(path string) (FileMeta, error) {
 	return meta, nil
 }
 
-func (meta *FileMeta) WriteMetaFile(path string) (FileMeta, error) {
+func (meta *FileMeta) WriteMetaFile(path string) error {
 	var (
 		fileMetaByte []byte
 		err          error
 	)
 
 	if fileMetaByte, err = json.Marshal(meta); err != nil {
-		return *meta, err
+		return err
 	}
 	if err = os.WriteFile(path, fileMetaByte, 0644); err != nil {
-		return *meta, err
+		return err
 	}
-	return *meta, nil
+	return nil
 }
 
 func (meta *FileMeta) FileHide() {
