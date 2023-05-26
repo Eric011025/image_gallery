@@ -8,6 +8,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// TODO : 북마크 내에서도 여러개로 분기. 어느 북마크에 저장할지 지정할 수 있도록 수정.
+
 const (
 	bookmarkListFile = ".bookmark"
 )
