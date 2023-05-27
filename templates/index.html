@@ -235,6 +235,33 @@
     <button id="scroll-to-bottom" onclick="scrollToBottom()">&#x21e9;</button>
 
     <script>
+        let imagePaths = [
+            {{- range .Files}}
+                {{- if eq .Type "file"}}
+                    '/{{.Path}}',
+                {{- end}}
+            {{- end}}
+        ];
+        let currentImageIndex = 0;
+
+
+        document.addEventListener('keydown', function (event) {
+            switch (event.keyCode) {
+                case 37: // 왼쪽 방향키
+                    if (currentImageIndex > 0) {
+                        currentImageIndex--;
+                        showModal(null, imagePaths[currentImageIndex]);
+                    }
+                    break;
+                case 39: // 오른쪽 방향키
+                    if (currentImageIndex < imagePaths.length - 1) {
+                        currentImageIndex++;
+                        showModal(null, imagePaths[currentImageIndex]);
+                    }
+                    break;
+            }
+        });
+
         function toggleMenu(menuButton) {
             event.stopPropagation();
             menuButton.parentElement.classList.toggle('menu-open');
@@ -274,13 +301,15 @@
         }
 
         function showModal(event, imagePath) {
-            event.preventDefault(); 
+            if (event) event.preventDefault();
 
             const modal = document.getElementById("imageModal");
             const modalImage = document.getElementById("modalImage");
 
             modal.style.display = "block";
             modalImage.src = imagePath;
+
+            currentImageIndex = imagePaths.indexOf(imagePath);
         }
 
         function closeModal() {
@@ -314,7 +343,7 @@
             const currentPath = currentURL.pathname;
             const parentPath = currentPath.substring(0, currentPath.lastIndexOf('/'));
             window.location.href = currentURL.origin + parentPath;
-            updateCurrentPath(); 
+            updateCurrentPath();
         }
 
         function refreshImageList() {
@@ -324,7 +353,7 @@
         document.querySelector(".refresh-button").onclick = function (event) {
             event.preventDefault();
             refreshImageList();
-            updateCurrentPath(); 
+            updateCurrentPath();
         };
 
         updateCurrentPath();
