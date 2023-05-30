@@ -79,8 +79,7 @@ func DeleteFileHandler(c *fiber.Ctx) error {
 	}
 
 	// file meta file
-	metaPath = fullPath + ".meta"
-	if meta, err = filemeta.ReadMeta(metaPath); err != nil {
+	if meta, err = filemeta.ReadMeta(fullPath); err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString("Internal Server Error")
 	}
 	meta.FileHide()
@@ -120,8 +119,7 @@ func PatchBookmarkHandler(c *fiber.Ctx) error {
 	}
 
 	// file meta file
-	metaPath = fullPath + ".meta"
-	if meta, err = filemeta.ReadMeta(metaPath); err != nil {
+	if meta, err = filemeta.ReadMeta(fullPath); err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString("Internal Server Error")
 	}
 	meta.FileBookmark()

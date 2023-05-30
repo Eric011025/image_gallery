@@ -37,7 +37,7 @@ func GetFile(path string) (FileInfo, error) {
 	if fileStat.IsDir() {
 		file.Type = "directory"
 	} else {
-		if meta, err = filemeta.ReadMeta(path + ".meta"); err != nil {
+		if meta, err = filemeta.ReadMeta(path); err != nil {
 			return file, err
 		}
 		file.Type = "file"
@@ -89,7 +89,7 @@ func GetFiles(dir string) ([]FileInfo, error) {
 		fileType := "directory"
 		if !file.IsDir() {
 			// 삭제한 파일인지 확인
-			if meta, err = filemeta.ReadMeta(filePath + ".meta"); err != nil {
+			if meta, err = filemeta.ReadMeta(filePath); err != nil {
 				return nil, err
 			}
 			if meta.Hide {

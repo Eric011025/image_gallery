@@ -18,11 +18,12 @@ type FileMeta struct {
 func ReadMeta(path string) (FileMeta, error) {
 	var (
 		meta     FileMeta
+		metaPath = path + ".meta"
 		fileByte []byte
 		err      error
 	)
 
-	if fileByte, err = os.ReadFile(path); err != nil {
+	if fileByte, err = os.ReadFile(metaPath); err != nil {
 		if os.IsNotExist(err) {
 			// create meta file
 			if err = meta.WriteMetaFile(path); err != nil {
@@ -48,7 +49,7 @@ func (meta *FileMeta) WriteMetaFile(path string) error {
 	if fileMetaByte, err = json.Marshal(meta); err != nil {
 		return err
 	}
-	if err = os.WriteFile(path, fileMetaByte, 0644); err != nil {
+	if err = os.WriteFile(path+".meta", fileMetaByte, 0644); err != nil {
 		return err
 	}
 	return nil
