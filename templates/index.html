@@ -245,15 +245,12 @@
         {{end}}
     </div>
     <!-- 이미지 모달 코드 -->
-<!-- 이미지 모달 코드 -->
-<div id="imageModal" class="modal" onclick="closeModal()">
-    <div class="modal-content">
-        <img class="modal-image" id="modalImage">
-        <div class="modal-text" id="modalExif"></div>
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <img class="modal-image" id="modalImage">
+            <div class="modal-text" id="modalExif"></div>
+        </div>
     </div>
-</div>
-
-
 
     <button id="scroll-to-top" onclick="scrollToTop()">&#x21e7;</button>
     <button id="scroll-to-bottom" onclick="scrollToBottom()">&#x21e9;</button>
