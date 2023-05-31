@@ -141,10 +141,29 @@
         }
 
         .modal-content {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch; /* 이미지와 텍스트 박스의 높이를 동일하게 만듭니다. */
+            justify-content: space-between;
             margin: auto;
-            display: block;
-            width: 80%;
-            max-width: 700px;
+            max-width: 80%; /* 모달의 최대 너비를 조정하실 수 있습니다. */
+            padding: 5px;
+        }
+
+        .modal-image {
+            width: 50%;
+            max-width: 500px; /* 이미지의 최대 너비를 조정하실 수 있습니다. */
+            object-fit: cover; /* 이미지의 높이를 조절합니다. */
+        }
+
+        .modal-text {
+            width: 50%;
+            max-width: 400px; /* 텍스트 박스의 최대 너비를 조정하실 수 있습니다. */
+            overflow: auto;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            text-align: justify;
+            word-wrap: break-word; /* 자동 줄바꿈 설정 */
         }
 
         .modal-content:after {
@@ -226,22 +245,28 @@
         {{end}}
     </div>
     <!-- 이미지 모달 코드 -->
-    <div id="imageModal" class="modal" onclick="closeModal()">
-        <img class="modal-content" id="modalImage">
+<!-- 이미지 모달 코드 -->
+<div id="imageModal" class="modal" onclick="closeModal()">
+    <div class="modal-content">
+        <img class="modal-image" id="modalImage">
+        <div class="modal-text" id="modalExif"></div>
     </div>
+</div>
+
 
 
     <button id="scroll-to-top" onclick="scrollToTop()">&#x21e7;</button>
     <button id="scroll-to-bottom" onclick="scrollToBottom()">&#x21e9;</button>
 
     <script>
-        let imagePaths = [
-            {{- range .Files}}
-                {{- if eq .Type "file"}}
-                    '/{{.Path}}',
-                {{- end}}
+        let imagePaths = [];
+        let imageExifData = {};
+        {{- range .Files}}
+            {{- if eq .Type "file"}}
+                imagePaths.push('/{{.Path}}');
+                imageExifData['/{{.Path}}'] = '{{.FileMeta.Exif.Parameters}}';
             {{- end}}
-        ];
+        {{- end}}
         let currentImageIndex = 0;
 
 
@@ -308,6 +333,7 @@
 
             modal.style.display = "block";
             modalImage.src = imagePath;
+            modalExif.innerText = imageExifData[imagePath].replace(/\\n/g, '\n');
 
             currentImageIndex = imagePaths.indexOf(imagePath);
         }
