@@ -146,19 +146,17 @@
             align-items: stretch; /* 이미지와 텍스트 박스의 높이를 동일하게 만듭니다. */
             justify-content: space-between;
             margin: auto;
-            max-width: 80%; /* 모달의 최대 너비를 조정하실 수 있습니다. */
+            width: 80%; /* 모달의 최대 너비를 조정하실 수 있습니다. */
+            height: 80%;
             padding: 5px;
         }
 
         .modal-image {
-            width: 50%;
-            max-width: 500px; /* 이미지의 최대 너비를 조정하실 수 있습니다. */
             object-fit: cover; /* 이미지의 높이를 조절합니다. */
         }
 
         .modal-text {
             width: 50%;
-            max-width: 400px; /* 텍스트 박스의 최대 너비를 조정하실 수 있습니다. */
             overflow: auto;
             padding-top: 10px;
             padding-bottom: 10px;
