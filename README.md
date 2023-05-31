@@ -11,4 +11,5 @@
     - 수정일로 정렬
 
 ## Dependencies
-- Ffmpeg: Used for image previews.
+- Ffmpeg: Use for image previews.
+- exiftool : Use for image exifdata.
