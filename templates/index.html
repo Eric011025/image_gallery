@@ -309,11 +309,6 @@
             }
         });
 
-        function toggleMenu(menuButton) {
-            event.stopPropagation();
-            menuButton.parentElement.classList.toggle('menu-open');
-        }
-
         function deleteImage(filePath) {
             fetch(filePath, {
                     method: 'DELETE',
