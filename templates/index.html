@@ -207,7 +207,11 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="search-container mb-3">
+        <input type="text" id="searchBox" oninput="filterImageList()" class="form-control" placeholder="Search images...">
+    </div>
+
+    <div class="row" id="imageRow">
         {{range .Files}}
         {{if eq .Type "file"}}
         <div class="col-md-4 col-sm-6 col-xs-12 mb-4">
@@ -308,6 +312,22 @@
                     break;
             }
         });
+
+        function filterImageList() {
+            const searchQuery = document.getElementById('searchBox').value.toLowerCase();
+            const imageContainers = document.getElementById('imageRow').children;
+
+            for (let i = 0; i < imageContainers.length; i++) {
+                const imagePath = imagePaths[i];
+                const imageExif = imageExifData[imagePath].toLowerCase();
+
+                if (imageExif.includes(searchQuery)) {
+                    imageContainers[i].style.display = 'block';
+                } else {
+                    imageContainers[i].style.display = 'none';
+                }
+            }
+        }
 
         function deleteImage(filePath) {
             fetch(filePath, {
