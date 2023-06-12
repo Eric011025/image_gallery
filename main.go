@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/template/html"
 	"github.com/joho/godotenv"
 
@@ -38,6 +39,12 @@ func main() {
 	app := fiber.New(fiber.Config{
 		Views: engine,
 	})
+
+	app.Use(logger.New(logger.Config{
+		Format:     "${pid} ${time} ${status} ${latency} ${method} ${path}\n",
+		TimeFormat: "2006-01-02 15:04:05",
+		TimeZone:   "Asia/Seoul",
+	}))
 
 	app.Get("/bookmark", bookmark.GetBookmarkList)
 
